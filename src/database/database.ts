@@ -1,17 +1,24 @@
-import { Pool } from "pg";
+import { config } from "dotenv";
+import { Pool, QueryArrayResult } from "pg";
+config();
 
 const pgPool = new Pool({
-  user: process.env.USER,
-  password: process.env.PASSWORD,
-  database: process.env.DATABASE,
-  host: process.env.HOST,
+  user: process.env.REACT_FOOD_BACKEND_USER,
+  password: process.env.REACT_FOOD_BACKEND_PASSWORD,
+  database: process.env.REACT_FOOD_BACKEND_DATABASE,
+  host: process.env.REACT_FOOD_BACKEND_HOST,
 });
 
-export const database = async (scripts: any, query: any) => {
+export const database = async (scripts: any, query: any[]) => {
   try {
     const result = await pgPool.query(scripts, query);
-    return result;
+    return result as QueryArrayResult;
   } catch (error: any) {
-    throw new error(error);
+    console.log("Error Found:", {
+      file: "database.js",
+      method: "database",
+      error,
+    });
+    throw new Error(error);
   }
 };
