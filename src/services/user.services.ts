@@ -16,11 +16,6 @@ export class UserService {
       const userData = user.rows[0] as {};
       return userData as UserI;
     } catch (error: any) {
-      console.log("Error Found:", {
-        file: "user.services.ts",
-        method: "isUserAlreadyRegister",
-        error,
-      });
       throw new Error(error);
     }
   }
@@ -45,11 +40,6 @@ export class UserService {
       }
       return;
     } catch (error: any) {
-      console.log("Error Found:", {
-        file: "user.services.ts",
-        method: "register",
-        error,
-      });
       throw new Error(error);
     }
   }
@@ -69,11 +59,6 @@ export class UserService {
       }
       return;
     } catch (error: any) {
-      console.log("Error Found:", {
-        file: "user.services.ts",
-        method: "signIn",
-        error,
-      });
       throw new Error(error);
     }
   }

@@ -7,4 +7,10 @@ export const SCRIPTS = {
     UPDATE_USER_REFRESH_TOKEN_BY_EMAIL:
       "update react_food.users set refresh_token = $1 where email = $2 and user_id = $3",
   },
+  FOOD: {
+    GET_ALL_FOODS:
+      "select food_id, name, price, ingredients, picture from react_food.food",
+    GET_SINGLE_FOOD:
+      "select food_id, name, price, ingredients, picture from react_food.food where food_id = $1",
+  },
 };

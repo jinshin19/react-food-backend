@@ -4,8 +4,13 @@ import { UserQueryHandler } from "../handlers/user.query.handler";
 import { UserCommandHandler } from "../handlers/user.command.handler";
 import { GoogleAuthenticatedUserI } from "../models/user.interfaces";
 import { generateCookie } from "../helpers/cookie.helper";
-import { TOKEN } from "../constants/token.constants";
+import {
+  CUSTOM_API_MESSAGE_RESPONSE,
+  TOKEN,
+} from "../constants/token.constants";
 import { config } from "dotenv";
+import { ApiResponseHandler } from "../services/api.response.handler.services";
+import { consoleLogger } from "../helpers/console.logger.helper";
 config();
 
 const router = Router();
@@ -22,20 +27,20 @@ router.get(
     failureRedirect: "",
   }),
   async (request, response) => {
+    const apiResponseHandler = new ApiResponseHandler();
+
     try {
       const user: GoogleAuthenticatedRequest =
         request.user as GoogleAuthenticatedRequest;
 
       if (user === undefined || user === null || !user) {
-        console.log("Failed to login", {
-          file: "google.auth.ts",
-          method: "/auth/google/callback",
-        });
-        return response.status(404).send({
-          ok: false,
-          data: null,
-          message: "Something went wrong",
-        });
+        consoleLogger(__filename, "/auth/google/callback");
+        return apiResponseHandler.errorResponseHandler(
+          response,
+          404,
+          null,
+          CUSTOM_API_MESSAGE_RESPONSE.FAILED.GOOGLE_AUTHENTICATED
+        );
       }
 
       const userData: GoogleAuthenticatedUserI = user._json;
@@ -49,12 +54,12 @@ router.get(
       if (!isRegistered) {
         const signedUp = await userCommandHandler.signUp(userData);
         if (!signedUp) {
-          return response.status(400).send({
-            ok: false,
-            data: null,
-            error: null,
-            message: "Failed to signup",
-          });
+          return apiResponseHandler.errorResponseHandler(
+            response,
+            400,
+            null,
+            CUSTOM_API_MESSAGE_RESPONSE.FAILED.SIGNUP
+          );
         }
         generateCookie(
           response,
@@ -77,12 +82,12 @@ router.get(
 
       const signedIn = await userCommandHandler.signIn(isRegistered);
       if (!signedIn) {
-        return response.status(400).send({
-          ok: false,
-          data: null,
-          error: null,
-          message: "Failed to signin",
-        });
+        return apiResponseHandler.errorResponseHandler(
+          response,
+          400,
+          "",
+          CUSTOM_API_MESSAGE_RESPONSE.FAILED.SIGNIN
+        );
       }
       generateCookie(response, TOKEN.COOKIE_ACCESS_TOKEN, signedIn.accessToken);
       generateCookie(
@@ -98,15 +103,13 @@ router.get(
           process.env.REACT_FOOD_BACKEND_GOOGLE_AUTHENTICATED_REDIRECT!
         );
     } catch (error) {
-      console.log("Failed to login", {
-        file: "google.auth.ts",
-        method: "/auth/google/callback",
-      });
-      return response.status(400).send({
-        ok: false,
-        data: null,
-        message: error,
-      });
+      consoleLogger(__filename, "/auth/google/callback");
+      return apiResponseHandler.errorResponseHandler(
+        response,
+        400,
+        "",
+        CUSTOM_API_MESSAGE_RESPONSE.FAILED.GOOGLE_AUTHENTICATED
+      );
     }
   }
 );
