@@ -8,3 +8,13 @@
 - author: [jinshin19](https://github.com/jinshin19) ( Backend )
 
 ---
+
+### Frontend Stack
+
+- React Vite
+
+### Backend Stack
+
+- ExpressJS
+
+---
