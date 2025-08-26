@@ -43,14 +43,3 @@ export class FoodController {
     }
   };
 }
-
-try uploading in github the json file e.g
-{
-  food_id,
-  name,
-  price,
-  picture: "github image too"
-}
-
-then fetched the github food api
-try asking chatGPT if this can be fetched too
