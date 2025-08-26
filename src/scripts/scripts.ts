@@ -13,4 +13,16 @@ export const SCRIPTS = {
     GET_SINGLE_FOOD:
       "select food_id, name, price, ingredients, picture from react_food.food where food_id = $1",
   },
+  CART: {
+    GET_USER_CARTS: `
+      select title, price, quantity from react_food.cart where user_id = $1
+    `,
+    ADD_CART: `
+    insert into react_food.cart (cart_id, user_id, food_id, title, price, quantity)
+    values ($1, $2, $3, $4, $5, $6)
+    `,
+    DELETE_USER_CART: `
+      delete from react_food.cart where user_id = $1 and cart_id = $2
+    `,
+  },
 };
