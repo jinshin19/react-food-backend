@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ApiResponseHandler } from "../services/api.response.handler.services";
+import { ApiResponseHandlerService } from "../services/api.response.handler.services";
 import { consoleLogger } from "../helpers/console.logger.helper";
 import { CartCommandHandler } from "../handlers/cart.command.handler";
 import { CartQueryHandler } from "../handlers/cart.query.handler";
@@ -9,7 +9,7 @@ export class CartController {
   constructor(
     private readonly cartQueryHandler = new CartQueryHandler(),
     private readonly cartCommandHandler = new CartCommandHandler(),
-    private readonly apiResponseHandler = new ApiResponseHandler()
+    private readonly apiResponseHandler = new ApiResponseHandlerService()
   ) {}
 
   getUserCartById = async (request: Request, response: Response) => {

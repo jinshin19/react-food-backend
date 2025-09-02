@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { API_RESPONSE } from "../constants/token.constants";
-export class ApiResponseHandler {
+export class ApiResponseHandlerService {
   successResponseHandler(
     response: Response,
     code: number = 200,

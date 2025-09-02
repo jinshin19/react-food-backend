@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { FoodQueryHandler } from "../handlers/food.query.handler";
-import { ApiResponseHandler } from "../services/api.response.handler.services";
+import { ApiResponseHandlerService } from "../services/api.response.handler.services";
 import { consoleLogger } from "../helpers/console.logger.helper";
 export class FoodController {
   constructor(
     private readonly foodQueryHandler = new FoodQueryHandler(),
-    private readonly apiResponseHandler = new ApiResponseHandler()
+    private readonly apiResponseHandler = new ApiResponseHandlerService()
   ) {}
 
   getFoods = async (_: Request, response: Response) => {

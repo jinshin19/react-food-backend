@@ -9,9 +9,12 @@ import {
   TOKEN,
 } from "../constants/token.constants";
 import { config } from "dotenv";
-import { ApiResponseHandler } from "../services/api.response.handler.services";
+import { ApiResponseHandlerService } from "../services/api.response.handler.services";
 import { consoleLogger } from "../helpers/console.logger.helper";
+import { AuthController } from "../controllers/auth.controller";
 config();
+
+const authController = new AuthController();
 
 const router = Router();
 
@@ -27,7 +30,7 @@ router.get(
     failureRedirect: "",
   }),
   async (request, response) => {
-    const apiResponseHandler = new ApiResponseHandler();
+    const apiResponseHandler = new ApiResponseHandlerService();
 
     try {
       const user: GoogleAuthenticatedRequest =
@@ -81,6 +84,7 @@ router.get(
       }
 
       const signedIn = await userCommandHandler.signIn(isRegistered);
+
       if (!signedIn) {
         return apiResponseHandler.errorResponseHandler(
           response,
@@ -113,6 +117,8 @@ router.get(
     }
   }
 );
+
+router.get("/validate", authController.validate);
 
 export default router;
 

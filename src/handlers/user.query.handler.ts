@@ -6,4 +6,7 @@ export class UserQueryHandler {
   async isUserAlreadyRegistered(email: string) {
     return await this.userService.isUserAlreadyRegistered(email);
   }
+  async getUserRefreshToken(email: string, user_id: string) {
+    return await this.userService.getUserRefreshToken(email, user_id);
+  }
 }

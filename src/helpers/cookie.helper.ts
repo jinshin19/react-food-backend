@@ -25,7 +25,13 @@ export const clearCookie = (res: Response, name: string) => {
 };
 
 export const getCookie = (cookie: any, name: string) => {
+  console.log("cookie", cookie);
   let match = cookie?.match(new RegExp("(^| )" + name + "=([^;]+)"));
+  console.log("match", {
+    name,
+    match,
+    // match2: match[2],
+  });
   if (match) return match[2];
   return null;
 };

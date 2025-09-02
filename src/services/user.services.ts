@@ -3,6 +3,7 @@ import {
   GoogleAuthenticatedUserI,
   RegisterUserI,
   UserI,
+  UserRefreshTokenI,
 } from "../models/user.interfaces";
 import { SCRIPTS } from "../scripts/scripts";
 
@@ -58,6 +59,22 @@ export class UserService {
         return null;
       }
       return;
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  }
+
+  async getUserRefreshToken(email: string, user_id: string) {
+    try {
+      const user = await database(
+        SCRIPTS.USER.GET_USER_REFRESH_TOKEN_BY_EMAIL_AND_ID,
+        [email, user_id]
+      );
+      if (!user.rowCount) {
+        return null;
+      }
+      const userData = user.rows[0] as {};
+      return userData as UserRefreshTokenI;
     } catch (error: any) {
       throw new Error(error);
     }

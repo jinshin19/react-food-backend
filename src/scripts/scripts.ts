@@ -1,5 +1,7 @@
 export const SCRIPTS = {
   USER: {
+    GET_USER_REFRESH_TOKEN_BY_EMAIL_AND_ID:
+      "select refresh_token from react_food.users where email = $1 and user_id = $2",
     GET_USER_BY_EMAIL:
       "select user_id, given_name, family_name, email, picture, refresh_token from react_food.users where email = $1",
     REGISTER_USER:

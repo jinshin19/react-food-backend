@@ -1,21 +1,22 @@
-import jwt from "jsonwebtoken";
+import jwt, { JwtHeader, JwtPayload } from "jsonwebtoken";
 import { config } from "dotenv";
 import {
   TokenTypeE,
   CustomReturnI,
   StatusTypeE,
+  PayloadI,
 } from "../models/token.interface";
 config();
-const { TokenExpiredError, JsonWebTokenError } = jwt;
-
 export class TokenServices {
   private readonly customSuccess = (
     token_type: TokenTypeE,
+    payload: PayloadI | null | JwtPayload,
     data: any
   ): CustomReturnI => {
     return {
       status_type: StatusTypeE.SUCCESS,
       token_type,
+      payload,
       data,
       message: null,
     };
@@ -25,6 +26,7 @@ export class TokenServices {
     return {
       status_type: StatusTypeE.ERROR,
       token_type: null,
+      payload: null,
       data: null,
       message: null,
     };
@@ -39,7 +41,7 @@ export class TokenServices {
 
   public readonly generateRefreshToken = (data: any): string => {
     const token = jwt.sign(data, process.env.REACT_FOOD_BACKEND_JWT_SECRET!, {
-      expiresIn: "10m",
+      expiresIn: "1hr",
     });
     return token;
   };
@@ -48,17 +50,24 @@ export class TokenServices {
     token_type: TokenTypeE,
     token: string
   ): CustomReturnI => {
-    const validatedToken = jwt.verify(
-      token,
-      process.env.REACT_FOOD_BACKEND_JWT_SECRET!
-    );
-    if (
-      validatedToken instanceof TokenExpiredError ||
-      validatedToken instanceof JsonWebTokenError
-    ) {
+    try {
+      const validatedToken = jwt.verify(
+        token,
+        process.env.REACT_FOOD_BACKEND_JWT_SECRET!
+      ) as JwtPayload;
+
+      delete validatedToken.iat;
+      delete validatedToken.exp;
+
+      console.log("validate_token_token_type", {
+        token_type,
+        validatedToken,
+      });
+
+      return this.customSuccess(token_type, validatedToken, token);
+    } catch (error) {
       return this.customError();
     }
-    return this.customSuccess(token_type, token);
   };
 
   public readonly validateTokens = (
@@ -73,7 +82,11 @@ export class TokenServices {
           TokenTypeE.ACCESS_TOKEN,
           accessToken
         );
-        return validatedAccessToken;
+        return this.customSuccess(
+          TokenTypeE.ACCESS_TOKEN,
+          null,
+          validatedAccessToken.data
+        );
       }
       if (!accessToken && refreshToken) {
         const validatedRefreshToken = this.validateToken(
@@ -84,14 +97,16 @@ export class TokenServices {
           return validatedRefreshToken;
         } else {
           const generatedAccessToken = this.generateAccessToken(
-            validatedRefreshToken.data
+            validatedRefreshToken.payload
           );
           return this.customSuccess(
             TokenTypeE.ACCESS_TOKEN,
+            null,
             generatedAccessToken
           );
         }
       }
+      // AccessToken
       const validatedAccessToken = this.validateToken(
         TokenTypeE.ACCESS_TOKEN,
         accessToken
@@ -99,16 +114,18 @@ export class TokenServices {
       if (validatedAccessToken.status_type === StatusTypeE.SUCCESS) {
         return validatedAccessToken;
       }
+      // RefreshToken
       const validatedRefreshToken = this.validateToken(
-        TokenTypeE.ACCESS_TOKEN,
-        accessToken
+        TokenTypeE.REFRESH_TOKEN,
+        refreshToken
       );
       if (validatedRefreshToken.status_type === StatusTypeE.SUCCESS) {
         const generatedAccessToken = this.generateAccessToken(
-          validatedRefreshToken.data
+          validatedRefreshToken.payload
         );
         return this.customSuccess(
           TokenTypeE.ACCESS_TOKEN,
+          null,
           generatedAccessToken
         );
       }

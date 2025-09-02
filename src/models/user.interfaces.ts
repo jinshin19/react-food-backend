@@ -17,6 +17,12 @@ export interface UserI {
   refresh_token: string;
 }
 
+export interface UserRefreshTokenI
+  extends Omit<
+    UserI,
+    "user_id" | "given_name" | "family_name" | "picture" | "email"
+  > {}
+
 export interface RegisterUserI {
   accessToken: string;
   refreshToken: string;

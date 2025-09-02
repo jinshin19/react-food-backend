@@ -5,8 +5,9 @@ import cookieParser from "cookie-parser";
 import { Server } from "http";
 import { config } from "dotenv";
 import { useSocket } from "./socket/socket";
-config();
 import "./auth/google";
+import { middleWare } from "./middleware/middleware";
+config();
 
 import authApi from "./routes/google.auth.routes";
 import foodApi from "./routes/food.routes";
@@ -20,12 +21,14 @@ useSocket(server);
 app.use(express.json());
 app.use(
   cors({
-    origin: "*",
+    origin: ["http://localhost:5173"],
+    credentials: true,
   })
 );
 app.use(cookieParser());
 app.use(passport.initialize());
 
 app.use("/api/v1/", authApi);
+app.use("/api/v1", middleWare);
 app.use("/api/v1/", foodApi);
 app.use("/api/v1/", cartApi);
